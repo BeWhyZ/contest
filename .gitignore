@@ -1,0 +1,17 @@
+# Default ignored files
+.idea/
+# service/api/etc/*.yaml
+.DS_Store
+service/api/upload/img/*
+# .vscode
+__debug_bin*.exe
+
+
+service/api/logs
+service/api/etc/api*.yaml
+!service/api/etc/api.test.yaml
+service/api/etc/config.local.yaml
+
+logs
+.vscode/
+*.http
