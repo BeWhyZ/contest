@@ -15,3 +15,4 @@ service/api/etc/config.local.yaml
 logs
 .vscode/
 *.http
+contestR/target
