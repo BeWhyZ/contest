@@ -16,3 +16,7 @@ logs
 .vscode/
 *.http
 contestR/target
+
+# Added by cargo
+
+/target

@@ -29,3 +29,11 @@ Constraints:
 
 1 <= nums.length <= 105
 -109 <= nums[i] <= 109
+
+
+desc:
+
+    my dp: dp[i][j] 表示[i,j]中的乘积最大的subarray length
+    
+    
+
