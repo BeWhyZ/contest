@@ -4,39 +4,25 @@ use std::io::{self, BufRead};
 struct Solution;
 // 0111 0100 xor => 0111
 impl Solution {
-    // 1001 1000 [0000 1000] xor => 1001 0000, 合并两个数的所有1 bit
     fn can_transform(a: Vec<i32>, b: Vec<i32>) -> bool {
-        let n = a.len();
-
-        // For each index i (1 ≤ i ≤ n), check if one of the three conditions holds:
-        // 1. a[i] = b[i] (no operation needed)
-        // 2. a[i] ⊕ a[i+1] = b[i] (operate on index i first, if i < n)
-        // 3. a[i] ⊕ b[i+1] = b[i] (operate on index i+1 first, if i < n)
-
-        for i in 0..n {
+        for i in 0..a.len() {
             let mut valid = false;
 
-            // Condition 1: a[i] = b[i]
             if a[i] == b[i] {
                 valid = true;
             }
 
-            // Condition 2 and 3: only applicable if i < n-1 (i.e., there's an i+1)
-            if i < n - 1 {
-                // Condition 2: a[i] ⊕ a[i+1] = b[i]
+            if i < a.len() - 1 {
                 if a[i] ^ a[i + 1] == b[i] {
                     valid = true;
                 }
 
-                // Condition 3: a[i] ⊕ b[i+1] = b[i]
                 if a[i] ^ b[i + 1] == b[i] {
                     valid = true;
                 }
             }
-
-            // If none of the conditions hold for this index, transformation is impossible
             if !valid {
-                return false;
+                return valid;
             }
         }
 
@@ -238,7 +224,7 @@ fn main() {
             }
         };
 
-        if Solution::can_transform_graph(a, b) {
+        if Solution::can_transform(a, b) {
             println!("YES");
         } else {
             println!("NO");
