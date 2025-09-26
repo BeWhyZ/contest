@@ -199,6 +199,7 @@ impl MyLinkedList {
     }
 }
 
+fn main() {}
 // impl Drop for MyLinkedList {
 //     fn drop(&mut self) {
 //         while self.pop_front().is_some() {}
