@@ -1,0 +1,126 @@
+use std::collections::HashMap;
+use std::collections::LinkedList;
+
+struct LRUCache<'a> {
+    capacity: u32,
+    // key
+    pair: HashMap<i32, &'a i32>,
+    list: LinkedList<i32>,
+}
+
+impl<'a> LRUCache<'a> {
+    pub fn new(capacity: u32) -> Self {
+        Self {
+            capacity,
+            pair: HashMap::new(),
+            list: LinkedList::new(),
+        }
+    }
+
+    // O(1)
+    // add to head, and pop from tail
+    // the head is the most recently used, the tail is the least recently used
+    pub fn get(&self, key: i32) -> Option<i32> {
+        if let Some(value) = self.pair.get(&key) {
+        } else {
+            return None;
+        }
+        None
+    }
+
+    // O(1)
+    // if the key is in the cache, update the value
+    // if the key is not in the cache, add the key-value pair to the cache
+    // if the cache is full, remove the least recently used key-value pair
+    // add the key-value pair to the cache
+    pub fn put(&self, key: i32, value: i32) {}
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    enum Opt {
+        Get(i32),
+        Put(i32, i32),
+        New(u32),
+    }
+    struct Case {
+        opts: Vec<Opt>,
+        expected: Vec<Option<i32>>,
+        name: String,
+    }
+
+    #[test]
+    fn rest_solution() {
+        let test_cases = vec![Case {
+            opts: vec![
+                Opt::New(2),    // 创建容量为2的LRU缓存
+                Opt::Put(1, 1), // cache: {1=1}
+                Opt::Put(2, 2), // cache: {1=1, 2=2}
+                Opt::Get(1),    // 返回1，cache: {2=2, 1=1} (1变为最近使用)
+                Opt::Put(3, 3), // 淘汰2，cache: {1=1, 3=3}
+                Opt::Get(2),    // 返回-1 (未找到)
+                Opt::Put(4, 4), // 淘汰1，cache: {3=3, 4=4}
+                Opt::Get(1),    // 返回-1 (未找到)
+                Opt::Get(3),    // 返回3，cache: {4=4, 3=3} (3变为最近使用)
+                Opt::Get(4),    // 返回4，cache: {3=3, 4=4} (4变为最近使用)
+            ],
+            // 对应的返回值：[null, null, null, 1, null, -1, null, -1, 3, 4]
+            // 转换为Option类型，-1用None表示，数值用Some包装
+            expected: vec![
+                None,     // New(2) - 构造函数返回None
+                None,     // Put(1,1) - put操作返回None
+                None,     // Put(2,2) - put操作返回None
+                Some(1),  // Get(1) - 返回1
+                None,     // Put(3,3) - put操作返回None
+                Some(-1), // Get(2) - 返回-1，用None表示
+                None,     // Put(4,4) - put操作返回None
+                Some(-1), // Get(1) - 返回-1，用None表示
+                Some(3),  // Get(3) - 返回3
+                Some(4),  // Get(4) - 返回4
+            ],
+            name: "case1".to_string(),
+        }];
+
+        for case in test_cases {
+            if let Opt::New(capacity) = case.opts[0] {
+                let mut cache = LRUCache::new(capacity);
+                let mut result_index = 1; // 跳过第一个New操作
+
+                for opt in case.opts.iter().skip(1) {
+                    match *opt {
+                        Opt::Get(key) => {
+                            let res = cache.get(key);
+                            // 将Option<u32>转换为期望的格式：None表示-1，Some(x)表示x
+                            let expected = case.expected[result_index];
+                            if res.is_none() {
+                                // get返回None表示未找到，对应LeetCode的-1
+                                assert_eq!(
+                                    expected, None,
+                                    "Expected not found (-1) for key {}",
+                                    key
+                                );
+                            } else {
+                                assert_eq!(
+                                    res, expected,
+                                    "Expected {:?} for key {}",
+                                    expected, key
+                                );
+                            }
+                            result_index += 1;
+                        }
+                        Opt::Put(key, value) => {
+                            cache.put(key, value);
+                            // put操作不返回值，但在expected数组中占位
+                            result_index += 1;
+                        }
+                        Opt::New(_) => {
+                            panic!("New should not be called in iteration");
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
