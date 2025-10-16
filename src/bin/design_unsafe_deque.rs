@@ -463,7 +463,6 @@ mod test {
         assert_eq!(into_iter.next(), Some(3));
     }
 
-    use super::List;
 
     fn generate_test() -> List<i32> {
         list_from(&[0, 1, 2, 3, 4, 5, 6])
@@ -517,7 +516,7 @@ mod test {
     fn test_basic() {
         let mut m = List::new();
         assert_eq!(m.pop(), None);
-        assert_eq!(m.pop_back(), None);
+        assert_eq!(m.pop_tail(), None);
         assert_eq!(m.pop(), None);
         m.push_front(1);
         assert_eq!(m.pop(), Some(1));
