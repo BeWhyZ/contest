@@ -55,6 +55,10 @@ impl<T> LinkedList<T> {
         }
     }
 
+    pub fn clear(&mut self) {
+        while let Some(_) = self.pop_tail() {}
+    }
+
     pub fn pop_tail(&mut self) -> Option<Pair<T, T>> {
         self.tail.map(|node| unsafe {
             let tail = Box::from_raw(node.as_ptr());
@@ -84,12 +88,13 @@ impl<T> LinkedList<T> {
             if let Some(next) = (*node.as_ptr()).next {
                 (*next.as_ptr()).prev = (*node.as_ptr()).prev;
             } else {
-                self.tail = Some(node);
+                self.tail = (*node.as_ptr()).prev;
             }
             // 将node移动到head
             self.head.map(|old| {
                 (*old.as_ptr()).prev = Some(node);
                 (*node.as_ptr()).next = Some(old);
+                (*node.as_ptr()).prev = None;
             });
             self.head = Some(node);
 
@@ -105,6 +110,14 @@ struct LRUCache {
     list: LinkedList<i32>,
 }
 
+impl Drop for LRUCache {
+    fn drop(&mut self) {
+        self.pair.iter_mut().for_each(|(_, node)| *node = None);
+        self.list.clear();
+        self.pair.clear();
+    }
+}
+
 impl LRUCache {
     pub fn new(capacity: u32) -> Self {
         Self {
@@ -118,9 +131,12 @@ impl LRUCache {
     // add to head, and pop from tail
     // the head is the most recently used, the tail is the least recently used
     pub fn get(&mut self, key: i32) -> Option<i32> {
-        let node = self.pair.get_mut(&key)?;
-        let elem = unsafe { self.list.move_to_head(node)? };
-        Some((*elem).1)
+        if let Some(node) = self.pair.get_mut(&key) {
+            if let Some(elem) = self.list.move_to_head(node) {
+                return Some((*elem).1);
+            }
+        }
+        Some(-1)
     }
 
     // O(1)
@@ -134,13 +150,13 @@ impl LRUCache {
                 (*node.as_ptr()).elem = (key, value);
             });
         } else {
-            self.list.push_front((key, value));
-            self.pair.insert(key, Some(self.list.head.unwrap()));
-            if self.list.len() > self.capacity as usize {
+            if self.list.len() >= self.capacity as usize {
                 if let Some((rm_key, _)) = self.list.pop_tail() {
                     self.pair.remove(&rm_key);
                 }
             }
+            self.list.push_front((key, value));
+            self.pair.insert(key, Some(self.list.head.unwrap().clone()));
         }
     }
 }
