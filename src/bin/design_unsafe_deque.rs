@@ -105,22 +105,17 @@ impl<T> List<T> {
 
     // pop from tail
     pub fn pop_tail(&mut self) -> Option<T> {
-        unsafe {
-            if self.tail.is_none() {
-                return None;
-            }
-            let tail = Box::from_raw(self.tail.unwrap().as_ptr());
-
-            self.tail = tail.prev;
+        self.tail.map(|node| unsafe {
+            let result = Box::from_raw(node.as_ptr());
+            self.tail = result.prev;
             if let Some(new_tail) = self.tail {
                 (*new_tail.as_ptr()).next = None;
             } else {
                 self.head = None;
             }
-
             self.len -= 1;
-            Some(tail.elem)
-        }
+            result.elem
+        })
     }
 
     pub fn len(&self) -> usize {
@@ -462,7 +457,6 @@ mod test {
         let mut into_iter = list.into_iter().map(|x| x * 3);
         assert_eq!(into_iter.next(), Some(3));
     }
-
 
     fn generate_test() -> List<i32> {
         list_from(&[0, 1, 2, 3, 4, 5, 6])
